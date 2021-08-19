@@ -136,3 +136,10 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Output files
+*.jl
+*.jsonl
+*.jsonlines
+*.csv
+*.xml

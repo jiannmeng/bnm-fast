@@ -13,3 +13,10 @@ def url(id1: int, id2: int, dt: date) -> str:
         rf"{id2:08}"
         r"&mode=DISPLAY&info=INDYTM&screenId=PB030100"
     )
+
+
+def section_url(id: str) -> str:
+    return (
+        r"https://fast.bnm.gov.my/fastweb/public/FastPublicBrowseServlet.do?"
+        rf"mode=MAIN&taskId={id}"
+    )
