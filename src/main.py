@@ -1,13 +1,12 @@
+import asyncio
+import logging
+from pathlib import Path
+from urllib.parse import quote
+
 import httpx
 from bs4 import BeautifulSoup
-from pathlib import Path
-import logging
-import re
 from rich import print
-import asyncio
-
 from rich.logging import RichHandler
-from urllib.parse import quote
 
 logging.basicConfig(
     level="DEBUG",
@@ -18,14 +17,19 @@ logging.basicConfig(
 logger = logging.getLogger("rich")
 
 XML_FOLDER = Path(__file__).resolve().parent.parent / "xml"
-CONSOLIDATED_IYTM_URL = "https://fast.bnm.gov.my/fastweb/public/FastPublicBrowseServlet.do?mode=MAIN&taskId=PB030100"
 BROWSE_URL = "https://fast.bnm.gov.my/fastweb/public/FastPublicBrowseServlet.do"
 INFO_URL = "https://fast.bnm.gov.my/fastweb/public/PublicInfoServlet.do"
 
 
 # 200500000021æ07052021æ00000088èCorporate Bond
-def format_data_id(data_id: str) -> str:
-    return data_id.replace("/", "").replace("æ", "-").replace("è", "-") + ".xml"
+def to_xml_name(id: str) -> str:
+    """Convert an encoded id from FAST website into filesystem-safe name with .xml
+    extension.
+
+    e.g. 200500000021æ14/09/2021æ00000088èCorporate Bond Ratingsè14/09/2021
+    becomes 200500000021-14092021-00000088-Corporate Bond Ratings-14092021.xml
+    """
+    return id.replace("/", "").replace("æ", "-").replace("è", "-") + ".xml"
 
 
 def browse_formdata(page: int) -> dict[str, str]:
@@ -102,7 +106,7 @@ async def main():
     for xml in XML_FOLDER.iterdir():
         downloaded_ids.add(xml.name)
     for data_id in retreived_ids:
-        if format_data_id(data_id) not in downloaded_ids:
+        if to_xml_name(data_id) not in downloaded_ids:
             new_ids.add(data_id)
 
     async def get_xml(data_id: str):
@@ -117,7 +121,7 @@ async def main():
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 },
             )
-            with open(XML_FOLDER / format_data_id(data_id), "wb") as f:
+            with open(XML_FOLDER / to_xml_name(data_id), "wb") as f:
                 f.write(response.content)
 
     tasks = [get_xml(data_id) for data_id in new_ids]
