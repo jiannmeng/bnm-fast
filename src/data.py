@@ -82,7 +82,7 @@ def main():
     rows.sort()
     logger.info("Sorted all rows")
 
-    csv_path = OUTPUT_FOLDER / "result.csv"
+    csv_path = OUTPUT_FOLDER / "consolidated_iytm.csv"
     with open(csv_path, "w", newline="") as fp:
         writer = csv.writer(fp)
         for row in rows:
