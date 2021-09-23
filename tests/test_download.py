@@ -1,4 +1,4 @@
-from src.main import to_xml_name
+from src.download import to_xml_name
 
 
 def test_to_xml_name():

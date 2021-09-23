@@ -1,8 +1,6 @@
-import datetime
 import re
 import xml.etree.ElementTree as etree
 from dataclasses import dataclass
-from decimal import Decimal
 import csv
 from pathlib import Path
 from typing import Union
@@ -39,28 +37,20 @@ def find_one(element, tag: str) -> str:
 
 @dataclass
 class Row:
-    date: datetime.date
+    date: str
     category: str
     subcategory: str
     tenor: str
-    ytm: Decimal
-
-    @property
-    def tenor_yrs(self) -> float:
-        if match := TENOR_Y_REGEX.match(self.tenor):
-            return float(match.group(1))
-        if match := TENOR_M_REGEX.match(self.tenor):
-            return float(match.group(1)) / 12
-        raise MissingInfoError("No valid tenor was found")
+    ytm: str
 
     def __lt__(self, other):
         return (
             self.date,
             self.category,
             self.subcategory,
-            self.tenor_yrs,
+            self.tenor,
             self.ytm,
-        ) < (other.date, other.category, other.subcategory, other.tenor_yrs, other.ytm)
+        ) < (other.date, other.category, other.subcategory, other.tenor, other.ytm)
 
     def writeout(self):
         return
@@ -78,11 +68,11 @@ def iter_xml(fp: PathLike):
             tenor = parse_tenor(tenor)
             ytm = find_one(ytm_details, "ytm")
             row = Row(
-                date=datetime.datetime.strptime(date, "%Y%m%d").date(),
+                date=date,
                 category=category,
                 subcategory=subcategory,
                 tenor=parse_tenor(tenor),
-                ytm=Decimal(ytm),
+                ytm=ytm,
             )
             yield row
 
@@ -100,7 +90,7 @@ def parse_tenor(tenor: str) -> str:
 
 
 def main():
-    allrows = []
+    allrows: list[Row] = []
     num = 1
     for xml in XML_FOLDER.iterdir():
         num += 1
@@ -117,7 +107,6 @@ def main():
                     row.date,
                     row.category,
                     row.subcategory,
-                    row.tenor_yrs,
                     row.tenor,
                     row.ytm,
                 )
