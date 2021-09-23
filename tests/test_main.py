@@ -1,4 +1,3 @@
-import pytest
 from src.main import to_xml_name
 
 
