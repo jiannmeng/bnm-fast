@@ -1,18 +1,17 @@
+import csv
 import re
 import xml.etree.ElementTree as etree
-from dataclasses import dataclass
-import csv
+from collections import namedtuple
 from pathlib import Path
-from typing import Union
+from typing import Iterator, Union
 
 from rich import print
 
+from src.common import OUTPUT_FOLDER, XML_FOLDER, logger
+
 PathLike = Union[Path, str]
+Row = namedtuple("Row", "date category subcategory tenor ytm")
 
-# df = pd.read_xml("tests/200500000018-17092001-00000043-Government Securities (Conventional)-17092001.xml")
-
-
-XML_FOLDER = Path(__file__).resolve().parent.parent / "xml"
 TENOR_Y_REGEX = re.compile(r"(\d+)Y")
 TENOR_M_REGEX = re.compile(r"(\d+)M")
 TENOR_YEAR_REGEXES = [
@@ -35,29 +34,10 @@ def find_one(element, tag: str) -> str:
     return element.text
 
 
-@dataclass
-class Row:
-    date: str
-    category: str
-    subcategory: str
-    tenor: str
-    ytm: str
-
-    def __lt__(self, other):
-        return (
-            self.date,
-            self.category,
-            self.subcategory,
-            self.tenor,
-            self.ytm,
-        ) < (other.date, other.category, other.subcategory, other.tenor, other.ytm)
-
-    def writeout(self):
-        return
-
-
-def iter_xml(fp: PathLike):
+def iter_xml(fp: PathLike) -> Iterator[Row]:
+    fp = Path(fp)
     tree = etree.parse(fp)
+
     ytmresult = tree.getroot()
     for ytm in ytmresult.findall("ytm"):
         category = find_one(ytm, "category")
@@ -71,7 +51,7 @@ def iter_xml(fp: PathLike):
                 date=date,
                 category=category,
                 subcategory=subcategory,
-                tenor=parse_tenor(tenor),
+                tenor=tenor,
                 ytm=ytm,
             )
             yield row
@@ -84,33 +64,30 @@ def parse_tenor(tenor: str) -> str:
     for regex in TENOR_MONTH_REGEXES:
         if (match := regex.search(tenor)) is not None:
             return match.group(1) + "M"
-
-    return tenor
-    # raise MissingInfoError("No valid regex exists for this tenor")
+    raise MissingInfoError("No valid regex exists for this tenor")
 
 
 def main():
-    allrows: list[Row] = []
-    num = 1
-    for xml in XML_FOLDER.iterdir():
-        num += 1
-        allrows.extend(iter_xml(xml))
-        if num % 1000 == 0:
-            print(f"file {num}, allrows={len(allrows)}")
-    allrows.sort()
+    rows: list[Row] = []
+    count = 0
+    for path in XML_FOLDER.iterdir():
+        if path.suffix != ".xml":
+            continue
+        count += 1
+        rows.extend(iter_xml(path))  # Add the rows to the list
+        if count % 1000 == 0:
+            logger.info(f"At {count} xml files: {len(rows)} rows so far")
+    logger.info(f"Total: {count} xml files, {len(rows)} rows")
 
-    with open("result.csv", "w", newline="") as fp:
+    rows.sort()
+    logger.info("Sorted all rows")
+
+    csv_path = OUTPUT_FOLDER / "result.csv"
+    with open(csv_path, "w", newline="") as fp:
         writer = csv.writer(fp)
-        for row in allrows:
-            writer.writerow(
-                (
-                    row.date,
-                    row.category,
-                    row.subcategory,
-                    row.tenor,
-                    row.ytm,
-                )
-            )
+        for row in rows:
+            writer.writerow(row)
+    logger.info(f"CSV saved to {csv_path}")
 
 
 if __name__ == "__main__":

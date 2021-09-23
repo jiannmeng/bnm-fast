@@ -1,23 +1,14 @@
 import asyncio
-import logging
 import re
-from pathlib import Path
 from urllib.parse import quote
 from bs4.element import NavigableString
 
 import httpx
 from bs4 import BeautifulSoup
-from rich.logging import RichHandler
 
-logging.basicConfig(
-    level="DEBUG",
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
-)
-logger = logging.getLogger("rich")
+from src.common import XML_FOLDER, logger
 
-XML_FOLDER = Path(__file__).resolve().parent.parent / "xml"
+
 BROWSE_URL = "https://fast.bnm.gov.my/fastweb/public/FastPublicBrowseServlet.do"
 INFO_URL = "https://fast.bnm.gov.my/fastweb/public/PublicInfoServlet.do"
 
@@ -29,7 +20,6 @@ class WebsiteError(Exception):
     pass
 
 
-# 200500000021æ07052021æ00000088èCorporate Bond
 def to_xml_name(fast_id: str) -> str:
     """Convert an encoded id from FAST website into filesystem-safe name with .xml
     extension.
