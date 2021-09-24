@@ -85,6 +85,7 @@ def main():
     csv_path = OUTPUT_FOLDER / "consolidated_iytm.csv"
     with open(csv_path, "w", newline="") as fp:
         writer = csv.writer(fp)
+        writer.writerow(Row._fields)  # Header row
         for row in rows:
             writer.writerow(row)
     logger.info(f"CSV saved to {csv_path}")
@@ -97,4 +98,3 @@ if __name__ == "__main__":
     main()
     t1 = time.time()
     print(t1 - t0)
-    # main()
