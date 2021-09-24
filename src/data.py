@@ -79,7 +79,17 @@ def main():
             logger.info(f"At {count} xml files: {len(rows)} rows so far")
     logger.info(f"Total: {count} xml files, {len(rows)} rows")
 
-    rows.sort()
+    def row_sort(elem: Row):
+        return (
+            elem.date,
+            elem.category,
+            elem.subcategory,
+            elem.tenor[-1],
+            int(elem.tenor[:-1]),
+            elem.ytm,
+        )
+
+    rows.sort(key=row_sort)
     logger.info("Sorted all rows")
 
     csv_path = OUTPUT_FOLDER / "consolidated_iytm.csv"
