@@ -4,6 +4,7 @@ import xml.etree.ElementTree as etree
 from collections import namedtuple
 from pathlib import Path
 from typing import Iterator, Union
+import pandas as pd
 
 from rich import print
 
@@ -99,6 +100,16 @@ def main():
         for row in rows:
             writer.writerow(row)
     logger.info(f"CSV saved to {csv_path}")
+
+    # Excel
+    df = pd.read_csv(OUTPUT_FOLDER / "consolidated_iytm.csv")
+    df.date = pd.to_datetime(df.date, format="%Y%m%d")
+    df = df.astype({"ytm": float})
+
+    xlsx_path = OUTPUT_FOLDER / "consolidated_iytm.xlsx"
+    with pd.ExcelWriter(xlsx_path, datetime_format="YYYY-MM-DD") as writer:
+        df.to_excel(writer, index=False)
+    logger.info(f"XLSX saved to {xlsx_path}")
 
 
 if __name__ == "__main__":
