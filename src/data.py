@@ -51,7 +51,7 @@ def iter_xml(fp: PathLike) -> Iterator[Row]:
             row = Row(
                 date=date,
                 category=category,
-                subcategory=subcategory,
+                subcategory=subcategory.upper(),
                 tenor=tenor,
                 ytm=ytm,
             )
