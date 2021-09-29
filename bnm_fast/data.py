@@ -8,7 +8,7 @@ import pandas as pd
 
 from rich import print
 
-from src.common import OUTPUT_FOLDER, XML_FOLDER, logger
+from bnm_fast.common import OUTPUT_FOLDER, XML_FOLDER, logger
 
 PathLike = Union[Path, str]
 Row = namedtuple("Row", "date category subcategory tenor ytm")

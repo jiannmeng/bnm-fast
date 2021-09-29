@@ -1,4 +1,4 @@
-from src.data import Row, iter_xml, parse_tenor
+from bnm_fast.data import Row, iter_xml, parse_tenor
 
 GOV_CONV_OLD_FILE = "tests/200500000018-17092001-00000043-Government Securities (Conventional)-17092001.xml"
 

@@ -6,7 +6,7 @@ from bs4.element import NavigableString
 import httpx
 from bs4 import BeautifulSoup
 
-from src.common import XML_FOLDER, logger
+from bnm_fast.common import XML_FOLDER, logger
 
 
 BROWSE_URL = "https://fast.bnm.gov.my/fastweb/public/FastPublicBrowseServlet.do"
