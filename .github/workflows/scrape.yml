@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: Run Program
-        run: poetry python3 -m bnm_fast
+        run: poetry run python3 -m bnm_fast
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
