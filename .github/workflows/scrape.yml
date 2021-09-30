@@ -1,0 +1,26 @@
+name: Scrape BNM FAST
+
+on:
+  schedule:
+    - cron: "14 13 * * 1-5"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-pythong@v2
+        with:
+          python-version: '3.9'
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+      - name: Install dependencies
+        run: poetry install
+      - name: Test
+        run: poetry pytest
+      - name: Run Program
+        run: poetry python3 -m bnm_fast
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: output/*
