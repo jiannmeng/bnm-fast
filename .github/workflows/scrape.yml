@@ -3,6 +3,8 @@ name: Scrape BNM FAST
 on:
   schedule:
     - cron: "14 13 * * 1-5"
+  workflow_dispatch:
+    
 
 jobs:
   build:
