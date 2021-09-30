@@ -94,6 +94,7 @@ def main():
     logger.info("Sorted all rows")
 
     csv_path = OUTPUT_FOLDER / "consolidated_iytm.csv"
+    logger.info("Creating CSV file...")
     with open(csv_path, "w", newline="") as fp:
         writer = csv.writer(fp)
         writer.writerow(Row._fields)  # Header row
@@ -107,6 +108,7 @@ def main():
     df = df.astype({"ytm": float})
 
     xlsx_path = OUTPUT_FOLDER / "consolidated_iytm.xlsx"
+    logger.info("Creating XLSX file...")
     with pd.ExcelWriter(xlsx_path, datetime_format="YYYY-MM-DD") as writer:
         df.to_excel(writer, index=False)
     logger.info(f"XLSX saved to {xlsx_path}")
