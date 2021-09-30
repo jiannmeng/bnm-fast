@@ -27,3 +27,9 @@ jobs:
           automatic_release_tag: latest
           prerelease: false
           files: output/*
+      - name: Push new data files
+        run: |
+          git config --global user.name gh-actions-bot
+          git config --global user.email ""
+          git commit -am "Updated with latest data from BNM FAST"
+          git push
