@@ -18,8 +18,6 @@ jobs:
         uses: abatilo/actions-poetry@v2.1.3
       - name: Install dependencies
         run: poetry install
-      - name: Test
-        run: poetry pytest
       - name: Run Program
         run: poetry python3 -m bnm_fast
       - name: Release
